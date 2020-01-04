@@ -24,7 +24,7 @@ class PhotoController extends Controller
      */
     public function index()
     {
-        $photos = Photo::with(['owner'])
+        $photos = Photo::with(['owner', 'likes'])
             ->orderBy(Photo::CREATED_AT, 'desc')->paginate();
 
         return $photos;
@@ -38,7 +38,7 @@ class PhotoController extends Controller
     public function show(string $id)
     {
         $photo = Photo::where('id', $id)
-            ->with(['owner', 'comments.author'])->first();
+            ->with(['owner', 'comments.author', 'likes'])->first();
 
         return $photo ?? abort(404);
     }
@@ -122,5 +122,42 @@ class PhotoController extends Controller
         $new_comment = Comment::where('id', $comment->id)->with('author')->first();
 
         return response($new_comment, 201);
+    }
+
+    /**
+     * いいね
+     * @param string $id
+     * @return array
+     */
+    public function like(string $id)
+    {
+        $photo = Photo::where('id', $id)->with('likes')->first();
+
+        if (! $photo) {
+            abort(404);
+        }
+
+        $photo->likes()->detach(Auth::user()->id);
+        $photo->likes()->attach(Auth::user()->id);
+
+        return ["photo_id" => $id];
+    }
+
+    /**
+     * いいね解除
+     * @param string $id
+     * @return array
+     */
+    public function unlike(string $id)
+    {
+        $photo = Photo::where('id', $id)->with('likes')->first();
+
+        if (! $photo) {
+            abort(404);
+        }
+
+        $photo->likes()->detach(Auth::user()->id);
+
+        return ["photo_id" => $id];
     }
 }

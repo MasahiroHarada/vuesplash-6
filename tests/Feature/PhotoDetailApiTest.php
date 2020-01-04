@@ -44,6 +44,8 @@ class PhotoDetailApiTest extends TestCase
                         ];
                     })
                     ->all(),
+                'liked_by_user' => false,
+                'likes_count' => 0,
             ]);
     }
 }
