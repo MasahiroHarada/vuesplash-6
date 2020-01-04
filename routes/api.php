@@ -13,3 +13,6 @@ Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 // ログインユーザー
 Route::get('/user', fn() => Auth::user())->name('user');
+
+// 写真投稿
+Route::post('/photos', 'PhotoController@create')->name('photo.create');
